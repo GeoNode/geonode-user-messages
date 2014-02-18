@@ -1,5 +1,7 @@
-from django.conf.urls.defaults import patterns, include, url, handler404, handler500
-
+try:
+    from django.conf.urls import url, patterns
+except ImportError:
+    from django.conf.urls.defaults import url, patterns
 
 urlpatterns = patterns("user_messages.views",
     url(r"^inbox/$", "inbox", name="messages_inbox"),
