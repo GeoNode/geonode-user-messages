@@ -3,8 +3,8 @@ from datetime import datetime
 from django.core.urlresolvers import reverse
 from django.db import models
 
+from django.conf import settings
 from django.utils import timezone
-from django.contrib.auth.models import User
 
 from user_messages.managers import ThreadManager, MessageManager
 from user_messages.utils import cached_attribute
@@ -13,7 +13,7 @@ from user_messages.utils import cached_attribute
 class Thread(models.Model):
     
     subject = models.CharField(max_length=150)
-    users = models.ManyToManyField(User, through="UserThread")
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, through="UserThread")
     
     objects = ThreadManager()
     
@@ -44,7 +44,7 @@ class Thread(models.Model):
 class UserThread(models.Model):
     
     thread = models.ForeignKey(Thread)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     
     unread = models.BooleanField()
     deleted = models.BooleanField()
@@ -54,7 +54,7 @@ class Message(models.Model):
     
     thread = models.ForeignKey(Thread, related_name="messages")
     
-    sender = models.ForeignKey(User, related_name="sent_messages")
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="sent_messages")
     sent_at = models.DateTimeField(default=timezone.now)
     
     content = models.TextField()

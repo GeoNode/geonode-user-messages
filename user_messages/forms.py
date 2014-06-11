@@ -1,6 +1,6 @@
 from django import forms
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 from user_messages.models import Message
 
@@ -8,7 +8,7 @@ from user_messages.models import Message
 class NewMessageForm(forms.Form):
     
     subject = forms.CharField()
-    to_user = forms.ModelChoiceField(User.objects.all())
+    to_user = forms.ModelChoiceField(get_user_model().objects.all())
     content = forms.CharField(widget=forms.Textarea)
     
     def __init__(self, *args, **kwargs):
@@ -27,7 +27,7 @@ class NewMessageForm(forms.Form):
 class NewMessageFormMultiple(forms.Form):
     
     subject = forms.CharField()
-    to_user = forms.ModelMultipleChoiceField(User.objects.all())
+    to_user = forms.ModelMultipleChoiceField(get_user_model().objects.all())
     content = forms.CharField(widget=forms.Textarea)
     
     def __init__(self, *args, **kwargs):
