@@ -24,7 +24,8 @@ class MessageManager(Manager):
         from user_messages.models import Thread
         thread = Thread.objects.create(subject=subject)
         for user in to_users:
-            thread.userthread_set.create(user=user, deleted=False, unread=True)
+            if user != from_user:
+                thread.userthread_set.create(user=user, deleted=False, unread=True)
         thread.userthread_set.create(user=from_user, deleted=True, unread=False)
         msg = self.create(thread=thread, sender=from_user, content=content)
         message_sent.send(sender=self.model, message=msg, thread=thread, reply=False)
