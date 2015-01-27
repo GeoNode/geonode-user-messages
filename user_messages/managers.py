@@ -26,7 +26,10 @@ class MessageManager(Manager):
         for user in to_users:
             if user != from_user:
                 thread.userthread_set.create(user=user, deleted=False, unread=True)
-        thread.userthread_set.create(user=from_user, deleted=True, unread=False)
+        if from_user in to_users:
+            thread.userthread_set.create(user=from_user, deleted=False, unread=True)
+        else:
+            thread.userthread_set.create(user=from_user, deleted=True, unread=False)
         msg = self.create(thread=thread, sender=from_user, content=content)
         message_sent.send(sender=self.model, message=msg, thread=thread, reply=False)
         return msg
