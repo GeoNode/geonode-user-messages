@@ -6,9 +6,9 @@ from user_messages.models import Message
 
 
 class NewMessageForm(forms.Form):
-    
+
+    to_user = forms.ModelChoiceField(label="To",queryset=get_user_model().objects.exclude(username='AnonymousUser'))    
     subject = forms.CharField()
-    to_user = forms.ModelChoiceField(get_user_model().objects.all())
     content = forms.CharField(widget=forms.Textarea)
     
     def __init__(self, *args, **kwargs):
@@ -25,9 +25,9 @@ class NewMessageForm(forms.Form):
 
 
 class NewMessageFormMultiple(forms.Form):
-    
+
+    to_user = forms.ModelMultipleChoiceField(label="To",queryset=get_user_model().objects.exclude(username='AnonymousUser')) 
     subject = forms.CharField()
-    to_user = forms.ModelMultipleChoiceField(get_user_model().objects.all())
     content = forms.CharField(widget=forms.Textarea)
     
     def __init__(self, *args, **kwargs):

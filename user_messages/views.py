@@ -12,11 +12,11 @@ from user_messages.models import Thread
 
 @login_required
 def inbox(request, template_name="user_messages/inbox.html"):
-    threads = Thread.ordered(Thread.objects.inbox(request.user))
+    threads_all = Thread.ordered(Thread.objects.inbox(request.user))
     threads_unread = Thread.ordered(Thread.objects.unread(request.user))
     return render_to_response(template_name, {
-        "threads": threads,
-        "unread" : threads_unread
+        "threads_all": threads_all,
+        "threads_unread" : threads_unread,
     }, context_instance=RequestContext(request))
 
 
