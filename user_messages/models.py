@@ -5,6 +5,7 @@ from django.db import models
 
 from django.conf import settings
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 from user_messages.managers import ThreadManager, MessageManager
 from user_messages.utils import cached_attribute
@@ -12,8 +13,8 @@ from user_messages.utils import cached_attribute
 
 class Thread(models.Model):
     
-    subject = models.CharField(max_length=150)
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL, through="UserThread")
+    subject = models.CharField(_('Subject'), max_length=150)
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, through="UserThread", verbose_name=_('Users'))
     
     objects = ThreadManager()
     
@@ -54,10 +55,10 @@ class Message(models.Model):
     
     thread = models.ForeignKey(Thread, related_name="messages")
     
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="sent_messages")
-    sent_at = models.DateTimeField(default=timezone.now)
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="sent_messages", verbose_name=_('Sender'))
+    sent_at = models.DateTimeField(_('Sent at'), default=timezone.now)
     
-    content = models.TextField()
+    content = models.TextField(_('Content'))
     
     objects = MessageManager()
     
