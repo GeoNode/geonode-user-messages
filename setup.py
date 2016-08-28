@@ -3,7 +3,7 @@ from distutils.core import setup
 
 setup(
     name = "geonode-user-messages",
-    version = "0.1.3",
+    version = "0.1.5",
     author = "Eldarion",
     author_email = "development@eldarion.com",
     description = "Fork of user-messages: a reusable private user messages application for Django",
@@ -13,6 +13,7 @@ setup(
     packages = [
         "user_messages",
         "user_messages.tests",
+        "user_messages.migrations",
         "user_messages.templatetags",
     ],
     classifiers = [
