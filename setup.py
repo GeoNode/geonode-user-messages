@@ -9,7 +9,7 @@ setup(
     description = "Fork of user-messages: a reusable private user messages application for Django",
     long_description = open("README.rst").read(),
     license = "BSD",
-    url = "http://github.com/GeoNode/user_messages",
+    url = "http://github.com/GeoNode/geonode-user-messages",
     packages = [
         "user_messages",
         "user_messages.tests",
