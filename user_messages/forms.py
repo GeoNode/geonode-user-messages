@@ -1,15 +1,16 @@
 from django import forms
 
 from django.contrib.auth import get_user_model
+from django.utils.translation import ugettext_lazy as _
 
 from user_messages.models import Message
 
 
 class NewMessageForm(forms.Form):
 
-    to_user = forms.ModelChoiceField(label="To",queryset=get_user_model().objects.exclude(username='AnonymousUser'))    
-    subject = forms.CharField()
-    content = forms.CharField(widget=forms.Textarea)
+    to_user = forms.ModelChoiceField(label=_("To"), queryset=get_user_model().objects.exclude(username='AnonymousUser'))    
+    subject = forms.CharField(label=_("Subject"))
+    content = forms.CharField(label=_("Content"), widget=forms.Textarea)
     
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user")
@@ -26,9 +27,9 @@ class NewMessageForm(forms.Form):
 
 class NewMessageFormMultiple(forms.Form):
 
-    to_user = forms.ModelMultipleChoiceField(label="To",queryset=get_user_model().objects.exclude(username='AnonymousUser')) 
-    subject = forms.CharField()
-    content = forms.CharField(widget=forms.Textarea)
+    to_user = forms.ModelMultipleChoiceField(label=_("To"), queryset=get_user_model().objects.exclude(username='AnonymousUser')) 
+    subject = forms.CharField(label=_("Subject"))
+    content = forms.CharField(label=_("Content"), widget=forms.Textarea)
     
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user")
@@ -45,7 +46,7 @@ class NewMessageFormMultiple(forms.Form):
 
 class MessageReplyForm(forms.Form):
     
-    content = forms.CharField(widget=forms.Textarea)
+    content = forms.CharField(label=_("Content"), widget=forms.Textarea)
     
     def __init__(self, *args, **kwargs):
         self.thread = kwargs.pop("thread")
