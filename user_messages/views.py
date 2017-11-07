@@ -6,33 +6,41 @@ from django.views.decorators.http import require_POST
 
 from django.contrib.auth.decorators import login_required
 
-from user_messages.forms import MessageReplyForm, NewMessageForm, NewMessageFormMultiple
+from user_messages.forms import MessageReplyForm, NewMessageForm
+from user_messages.models import Message
 from user_messages.models import Thread
+from user_messages.models import UserThread
+from user_messages.models import GroupMemberThread
 
 
 @login_required
 def inbox(request, template_name="user_messages/inbox.html"):
-    threads_all = Thread.ordered(Thread.objects.inbox(request.user))
-    threads_unread = Thread.ordered(Thread.objects.unread(request.user))
-    return render_to_response(template_name, {
-        "threads_all": threads_all,
-        "threads_unread" : threads_unread,
-    }, context_instance=RequestContext(request))
+    return render_to_response(
+        template_name,
+        {
+            "threads_all": Thread.objects.sorted_active_threads(request.user),
+            "threads_unread" : Thread.objects.sorted_unread_threads(
+                request.user),
+        },
+        context_instance=RequestContext(request)
+    )
 
 
 @login_required
 def thread_detail(request, thread_id,
-    template_name="user_messages/thread_detail.html",
-    form_class=MessageReplyForm):
-    qs = Thread.objects.filter(userthread__user=request.user).distinct()
-    thread = get_object_or_404(qs, pk=thread_id)
+                  template_name="user_messages/thread_detail.html"):
+    thread = get_object_or_404(
+        Thread.objects.active_threads(request.user),
+        pk=thread_id
+    )
     if request.method == "POST":
-        form = form_class(request.POST, user=request.user, thread=thread)
+        #form = form_class(request.POST, user=request.user, thread=thread)
+        form = MessageReplyForm(request.POST, user=request.user, thread=thread)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse("messages_inbox"))
     else:
-        form = form_class(user=request.user, thread=thread)
+        form = MessageReplyForm(user=request.user, thread=thread)
         thread.userthread_set.filter(user=request.user).update(unread=False)
     return render_to_response(template_name, {
         "thread": thread,
@@ -41,38 +49,52 @@ def thread_detail(request, thread_id,
 
 
 @login_required
-def message_create(request, user_id=None,
-    template_name="user_messages/message_create.html",
-    form_class=None, multiple=False):
-    if form_class is None:
-        if multiple:
-            form_class = NewMessageFormMultiple
-        else:
-            form_class = NewMessageForm
-    
-    if user_id is not None:
-        user_id = [int(user_id)]
-    elif "to_user" in request.GET and request.GET["to_user"].isdigit():
-        user_id = map(int, request.GET.getlist("to_user"))
-    if not multiple and user_id:
-        user_id = user_id[0]
-    initial = {"to_user": user_id}
+def message_create(request, user_id=None, group_id=None,
+                   template_name="user_messages/message_create.html"):
+    initial = {
+        "to_users": [user_id],
+        "to_groups": [group_id],
+    }
     if request.method == "POST":
-        form = form_class(request.POST, user=request.user, initial=initial)
+        form = NewMessageForm(
+            request.POST, current_user=request.user, initial=initial)
         if form.is_valid():
-            msg = form.save()
-            return HttpResponseRedirect(msg.get_absolute_url())
+            message = Message.objects.new_message(
+                from_user=request.user,
+                to_users=form.cleaned_data["to_users"],
+                to_groups=form.cleaned_data["to_groups"],
+                subject=form.cleaned_data["subject"],
+                content=form.cleaned_data["content"]
+            )
+            return HttpResponseRedirect(message.get_absolute_url())
     else:
-        form = form_class(user=request.user, initial=initial)
-    return render_to_response(template_name, {
-        "form": form
-    }, context_instance=RequestContext(request))
+        form = NewMessageForm(current_user=request.user, initial=initial)
+    return render_to_response(
+        template_name,
+        {"form": form},
+        context_instance=RequestContext(request)
+    )
 
 
 @login_required
 @require_POST
 def thread_delete(request, thread_id):
-    qs = Thread.objects.filter(userthread__user=request.user)
-    thread = get_object_or_404(qs, pk=thread_id)
-    thread.userthread_set.filter(user=request.user).update(deleted=True)
+    thread = get_object_or_404(
+        Thread.objects.active_threads(request.user),
+        pk=thread_id
+    )
+    try:
+        user_thread = thread.userthread_set.get(user=request.user)
+        user_thread.deleted = True
+        user_thread.save()
+    except UserThread.DoesNotExist:
+        # user is not participating in the discussion as standalone
+        # might part of one of the thread's groups though
+        pass
+    try:
+        member_threads = thread.groupmemberthread_set.filter(user=request.user)
+        member_threads.update(deleted=True)
+    except GroupMemberThread.DoesNotExist:
+        # user is not part of any groups that are in the discussion
+        pass
     return HttpResponseRedirect(reverse("messages_inbox"))

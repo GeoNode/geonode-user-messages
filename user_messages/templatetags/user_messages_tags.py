@@ -1,5 +1,7 @@
 from django import template
 
+from user_messages.models import Thread
+
 
 register = template.Library()
 
@@ -11,4 +13,4 @@ def unread(thread, user):
 
 @register.filter
 def unread_threads(user):
-    return user.userthread_set.filter(unread=True, deleted=False).count()
+    return Thread.objects.unread_threads(user).count()

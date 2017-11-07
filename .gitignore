@@ -2,3 +2,6 @@
 dist
 MANIFEST
 docs/_build
+
+# pycharm IDE files
+.idea

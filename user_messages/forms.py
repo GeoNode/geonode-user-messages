@@ -1,47 +1,53 @@
 from django import forms
+from django.db.models import Q
+from django.core.exceptions import ValidationError
 
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 
 from user_messages.models import Message
 
+from geonode.groups.models import GroupProfile
+
 
 class NewMessageForm(forms.Form):
 
-    to_user = forms.ModelChoiceField(label=_("To"), queryset=get_user_model().objects.exclude(username='AnonymousUser'))    
+    to_users = forms.ModelMultipleChoiceField(
+        label=_("To users"),
+        queryset=get_user_model().objects.exclude(username='AnonymousUser'),
+        required=False,
+    )
+    to_groups = forms.ModelMultipleChoiceField(
+        label=_("To groups"),
+        queryset=GroupProfile.objects.all(),
+        required=False,
+    )
     subject = forms.CharField(label=_("Subject"))
     content = forms.CharField(label=_("Content"), widget=forms.Textarea)
     
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop("user")
+        self.sender = kwargs.pop("current_user")
         super(NewMessageForm, self).__init__(*args, **kwargs)
-        if self.initial.get("to_user") is not None:
-            qs = self.fields["to_user"].queryset.filter(pk=self.initial["to_user"])
-            self.fields["to_user"].queryset = qs
-    
-    def save(self):
-        data = self.cleaned_data
-        return Message.objects.new_message(self.user, [data["to_user"]],
-            data["subject"], data["content"])
+        # show only public groups or ones that the current user is a member of
+        self.fields["to_groups"].queryset = GroupProfile.objects.filter(
+            Q(group__user=self.sender) | Q(access="public")
+        ).distinct()
+        self.fields["to_users"].queryset = self.fields[
+            "to_users"].queryset.exclude(id=self.sender.id)
 
+    def clean(self):
+        """Validate fields that depend on each other
 
-class NewMessageFormMultiple(forms.Form):
+        In this case we need to verify if at least one user or group has
+        been selected.
 
-    to_user = forms.ModelMultipleChoiceField(label=_("To"), queryset=get_user_model().objects.exclude(username='AnonymousUser')) 
-    subject = forms.CharField(label=_("Subject"))
-    content = forms.CharField(label=_("Content"), widget=forms.Textarea)
-    
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop("user")
-        super(NewMessageFormMultiple, self).__init__(*args, **kwargs)
-        if self.initial.get("to_user") is not None:
-            qs = self.fields["to_user"].queryset.filter(pk__in=self.initial["to_user"])
-            self.fields["to_user"].queryset = qs
-    
-    def save(self):
-        data = self.cleaned_data
-        return Message.objects.new_message(self.user, data["to_user"],
-            data["subject"], data["content"])
+        """
+
+        super(NewMessageForm, self).clean()
+        users = self.cleaned_data.get("to_users")
+        groups = self.cleaned_data.get("to_groups")
+        if not any(users) and not any(groups):
+            raise ValidationError(_("Must select at least one user or group."))
 
 
 class MessageReplyForm(forms.Form):
