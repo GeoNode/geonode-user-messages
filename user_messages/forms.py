@@ -14,12 +14,12 @@ class NewMessageForm(forms.Form):
 
     to_users = forms.ModelMultipleChoiceField(
         label=_("To users"),
-        queryset=get_user_model().objects.exclude(username='AnonymousUser'),
+        queryset=get_user_model().objects.all(),  # refined below in __init__
         required=False,
     )
     to_groups = forms.ModelMultipleChoiceField(
         label=_("To groups"),
-        queryset=GroupProfile.objects.all(),
+        queryset=GroupProfile.objects.all(),  # refined below in __init__
         required=False,
     )
     subject = forms.CharField(label=_("Subject"))
@@ -28,12 +28,17 @@ class NewMessageForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.sender = kwargs.pop("current_user")
         super(NewMessageForm, self).__init__(*args, **kwargs)
-        # show only public groups or ones that the current user is a member of
-        self.fields["to_groups"].queryset = GroupProfile.objects.filter(
-            Q(group__user=self.sender) | Q(access="public")
-        ).distinct()
-        self.fields["to_users"].queryset = self.fields[
-            "to_users"].queryset.exclude(id=self.sender.id)
+        if not self.sender.is_superuser:
+            # show only public groups or ones that the current user is a
+            # member of
+            self.fields["to_groups"].queryset = GroupProfile.objects.filter(
+                Q(group__user=self.sender) | Q(access="public")
+            ).distinct()
+        self.fields["to_users"].queryset = get_user_model().objects.exclude(
+            username="AnonymousUser").exclude(
+            id=self.sender.id).exclude(
+            is_active=False
+        )
 
     def clean(self):
         """Validate fields that depend on each other
