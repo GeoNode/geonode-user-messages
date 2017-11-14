@@ -86,7 +86,9 @@ class MessageManager(Manager):
             if user.id != from_user.id:
                 thread.userthread_set.create(user=user)
         for group_profile in to_groups:
-            for group_member in group_profile.groupmember_set.all():
+            active_members = group_profile.groupmember_set.filter(
+                user__is_active=True)
+            for group_member in active_members:
                 thread.groupmemberthread_set.create(
                     user=group_member.user,
                     group=group_profile.group,

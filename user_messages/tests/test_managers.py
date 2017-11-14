@@ -15,16 +15,21 @@ from user_messages import managers
 class Base(TestCase):
 
     def setUp(self):
+        self.user_password = "pass"
         self.first_user = get_user_model().objects.create_user(
-            "first", "first@fakemail.com", "pass")
+            "first", "first@fakemail.com", self.user_password)
         self.second_user = get_user_model().objects.create_user(
-            "second", "second@fakemail.com", "pass")
+            "second", "second@fakemail.com", self.user_password)
         self.third_user = get_user_model().objects.create_user(
-            "third", "third@fakemail.com", "pass")
+            "third", "third@fakemail.com", self.user_password)
         self.fourth_user = get_user_model().objects.create_user(
-            "fourth", "fourth@fakemail.com", "pass")
+            "fourth", "fourth@fakemail.com", self.user_password)
         self.fifth_user = get_user_model().objects.create_user(
-            "fifth", "fifth@fakemail.com", "pass")
+            "fifth", "fifth@fakemail.com", self.user_password)
+        self.inactive_user = get_user_model().objects.create_user(
+            "inactive_user", "inactive@fakemail.com", self.user_password)
+        self.inactive_user.is_active = False
+        self.inactive_user.save()
 
         self.first_group_profile = GroupProfile.objects.create(
             title="testfirst",
@@ -44,9 +49,11 @@ class Base(TestCase):
 
         self.first_group_profile.join(self.first_user)
         self.first_group_profile.join(self.second_user)
+
         self.second_group_profile.join(self.first_user)
         self.second_group_profile.join(self.third_user)
         self.second_group_profile.join(self.fourth_user)
+        self.second_group_profile.join(self.inactive_user)
 
 
 class ThreadManagerSingleUsersTestCase(Base):
@@ -292,10 +299,10 @@ class MessageManagerGroupsTestCase(Base):
     def test_new_message_thread_has_users(self):
         expected_members = []
         for group_profile in self.to_groups:
-            group_members = group_profile.group.user_set.all()
+            group_members = group_profile.group.user_set.filter(is_active=True)
             expected_members.extend(group_members)
-        for user_profile in expected_members:
-            self.message.thread.group_users.filter(id=user_profile.id)
+        for thread_member in self.message.thread.groupmemberthread_set.all():
+            self.assertIn(thread_member.user, expected_members)
 
     def test_new_message_thread_has_groups(self):
         for group_profile in self.to_groups:
@@ -305,6 +312,11 @@ class MessageManagerGroupsTestCase(Base):
             len(self.message.thread.registered_groups),
             2
         )
+
+    def test_new_message_thread_does_not_have_inactive_users(self):
+        thread_members = get_user_model().objects.filter(
+            groupmemberthread__thread=self.message.thread)
+        self.assertNotIn(self.inactive_user, thread_members)
 
     def test_new_message_sender_visibility_is_read(self):
         user_thread = self.message.sender.userthread_set.get(
