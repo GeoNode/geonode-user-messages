@@ -24,16 +24,23 @@ class NewMessageForm(forms.Form):
     )
     subject = forms.CharField(label=_("Subject"))
     content = forms.CharField(label=_("Content"), widget=forms.Textarea)
-    
+
     def __init__(self, *args, **kwargs):
         self.sender = kwargs.pop("current_user")
         super(NewMessageForm, self).__init__(*args, **kwargs)
         if not self.sender.is_superuser:
             # show only public groups or ones that the current user is a
             # member of
+            groups = self.sender.groups.all()
+            group_list_all = self.sender.group_list_all().values('group')
+            public_groups = GroupProfile.objects.exclude(access="public-invite").exclude(access="private").values('group')
+
             self.fields["to_groups"].queryset = GroupProfile.objects.filter(
-                Q(group__user=self.sender) | Q(access="public")
+                Q(group__isnull=True) | Q(group__in=groups) |
+                Q(group__in=public_groups) | Q(group__in=group_list_all) |
+                Q(group__user=self.sender)
             ).distinct()
+
         self.fields["to_users"].queryset = get_user_model().objects.exclude(
             username="AnonymousUser").exclude(
             id=self.sender.id).exclude(
@@ -56,14 +63,14 @@ class NewMessageForm(forms.Form):
 
 
 class MessageReplyForm(forms.Form):
-    
+
     content = forms.CharField(label=_("Content"), widget=forms.Textarea)
-    
+
     def __init__(self, *args, **kwargs):
         self.thread = kwargs.pop("thread")
         self.user = kwargs.pop("user")
         super(MessageReplyForm, self).__init__(*args, **kwargs)
-    
+
     def save(self):
         return Message.objects.new_reply(self.thread, self.user,
             self.cleaned_data["content"])
