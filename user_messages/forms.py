@@ -32,7 +32,11 @@ class NewMessageForm(forms.Form):
             # show only public groups or ones that the current user is a
             # member of
             groups = self.sender.groups.all()
-            group_list_all = self.sender.group_list_all().values('group')
+            group_list_all = []
+            try:
+                group_list_all = self.sender.group_list_all().values('group')
+            except:
+                pass
             public_groups = GroupProfile.objects.exclude(access="public-invite").exclude(access="private").values('group')
 
             self.fields["to_groups"].queryset = GroupProfile.objects.filter(
