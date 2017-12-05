@@ -19,7 +19,7 @@ class NewMessageForm(forms.Form):
     )
     to_groups = forms.ModelMultipleChoiceField(
         label=_("To groups"),
-        queryset=GroupProfile.objects.all(),  # refined below in __init__
+        queryset=GroupProfile.objects.all().order_by('title'),  # refined below in __init__
         required=False,
     )
     subject = forms.CharField(label=_("Subject"))
@@ -43,13 +43,13 @@ class NewMessageForm(forms.Form):
                 Q(group__isnull=True) | Q(group__in=groups) |
                 Q(group__in=public_groups) | Q(group__in=group_list_all) |
                 Q(group__user=self.sender)
-            ).distinct()
+            ).distinct().order_by('title')
 
         self.fields["to_users"].queryset = get_user_model().objects.exclude(
             username="AnonymousUser").exclude(
             id=self.sender.id).exclude(
             is_active=False
-        )
+        ).order_by('username')
 
     def clean(self):
         """Validate fields that depend on each other
