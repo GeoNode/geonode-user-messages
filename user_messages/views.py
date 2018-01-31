@@ -51,9 +51,13 @@ def thread_detail(request, thread_id,
 @login_required
 def message_create(request, user_id=None, group_id=None,
                    template_name="user_messages/message_create.html"):
+    subject = request.GET['subject'] if 'subject' in request.GET else ''
+    content = request.GET['content'] if 'content' in request.GET else ''
     initial = {
         "to_users": [user_id],
         "to_groups": [group_id],
+        "subject": subject,
+        "content": content,
     }
     if request.method == "POST":
         form = NewMessageForm(
