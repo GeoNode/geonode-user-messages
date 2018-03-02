@@ -6,3 +6,8 @@ docs/_build
 
 # pycharm IDE files
 .idea
+
+/geonode_user_messages.egg-info/dependency_links.txt
+/geonode_user_messages.egg-info/PKG-INFO
+/geonode_user_messages.egg-info/SOURCES.txt
+/geonode_user_messages.egg-info/top_level.txt
