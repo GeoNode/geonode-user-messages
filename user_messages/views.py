@@ -1,7 +1,6 @@
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render_to_response
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
 from django.contrib.auth.decorators import login_required
@@ -15,14 +14,14 @@ from user_messages.models import GroupMemberThread
 
 @login_required
 def inbox(request, template_name="user_messages/inbox.html"):
-    return render_to_response(
+    return render(
+        request,
         template_name,
-        {
+        context={
             "threads_all": Thread.objects.sorted_active_threads(request.user),
             "threads_unread" : Thread.objects.sorted_unread_threads(
                 request.user),
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -42,10 +41,10 @@ def thread_detail(request, thread_id,
     else:
         form = MessageReplyForm(user=request.user, thread=thread)
         thread.userthread_set.filter(user=request.user).update(unread=False)
-    return render_to_response(template_name, {
+    return render(request, template_name, context={
         "thread": thread,
         "form": form
-    }, context_instance=RequestContext(request))
+    })
 
 
 @login_required
@@ -73,10 +72,10 @@ def message_create(request, user_id=None, group_id=None,
             return HttpResponseRedirect(message.get_absolute_url())
     else:
         form = NewMessageForm(current_user=request.user, initial=initial)
-    return render_to_response(
+    return render(
+        request,
         template_name,
-        {"form": form},
-        context_instance=RequestContext(request)
+        context={"form": form}
     )
 
 
