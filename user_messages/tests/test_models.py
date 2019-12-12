@@ -1,7 +1,6 @@
 """Unit tests for user_messages.models."""
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 

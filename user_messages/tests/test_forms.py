@@ -1,7 +1,6 @@
 """Unit tests for user_messages.forms"""
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.test import TestCase
 
 from geonode.groups.models import GroupProfile
@@ -109,7 +108,7 @@ class NewMessageFormTestCase(TestCase):
             {
                 "subject": "dummy subject",
                 "content": "dummy content",
-                "to_users": [2,],
+                "to_users": [self.second_user.id,],
                 "to_groups": [],
             },
             current_user=self.first_user
@@ -122,7 +121,7 @@ class NewMessageFormTestCase(TestCase):
                 "subject": "dummy subject",
                 "content": "dummy content",
                 "to_users": [],
-                "to_groups": [1, 2],
+                "to_groups": [self.second_group.id, self.first_group.id],
             },
             current_user=self.first_user
         )
