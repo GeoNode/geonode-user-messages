@@ -62,6 +62,10 @@ class NewMessageForm(forms.Form):
         super(NewMessageForm, self).clean()
         users = self.cleaned_data.get("to_users")
         groups = self.cleaned_data.get("to_groups")
+        if users is None and groups is None:
+            # when data in field users/groups is not valid,
+            # cleaned_data function will not include the data or its field
+            raise ValidationError(_("Must have at least one validated user or group."))
         if not any(users) and not any(groups):
             raise ValidationError(_("Must select at least one user or group."))
 
