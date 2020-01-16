@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.0.0](https://github.com/GeoNode/geonode-user-messages/releases/tag/2.0.0)
+
+**Featrues**
+
+ - [Python 3](https://pypi.org/project/geonode-user-messages/)
+
 ## [0.1.15](https://github.com/GeoNode/geonode-user-messages/releases/tag/0.1.15)
 
 **Featrues**

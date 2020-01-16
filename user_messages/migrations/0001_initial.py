@@ -37,7 +37,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('sent_at', models.DateTimeField(default=django.utils.timezone.now)),
                 ('content', models.TextField()),
-                ('sender', models.ForeignKey(related_name='sent_messages', to=settings.AUTH_USER_MODEL)),
+                ('sender', models.ForeignKey(related_name='sent_messages',
+                                             to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('sent_at',),
@@ -56,8 +57,10 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('unread', models.BooleanField()),
                 ('deleted', models.BooleanField()),
-                ('thread', models.ForeignKey(to='user_messages.Thread')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('thread', models.ForeignKey(
+                    to='user_messages.Thread', on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(
@@ -68,6 +71,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='message',
             name='thread',
-            field=models.ForeignKey(related_name='messages', to='user_messages.Thread'),
+            field=models.ForeignKey(
+                related_name='messages', to='user_messages.Thread', on_delete=models.CASCADE),
         ),
     ]

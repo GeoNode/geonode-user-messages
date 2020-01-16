@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             name='GroupMemberThread',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('group', models.ForeignKey(to='auth.Group')),
+                ('group', models.ForeignKey(to='auth.Group', on_delete=models.CASCADE)),
             ],
         ),
         migrations.RemoveField(
@@ -37,12 +37,14 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='groupmemberthread',
             name='thread',
-            field=models.ForeignKey(to='user_messages.Thread'),
+            field=models.ForeignKey(
+                to='user_messages.Thread', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='groupmemberthread',
             name='user',
-            field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='thread',

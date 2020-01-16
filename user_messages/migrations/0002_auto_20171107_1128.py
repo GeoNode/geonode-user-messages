@@ -27,7 +27,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='message',
             name='sender',
-            field=models.ForeignKey(related_name='sent_messages', verbose_name='Sender', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='sent_messages', verbose_name='Sender',
+                                    to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='message',

@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from django.db.models import Q
 
@@ -72,13 +72,14 @@ class Thread(models.Model):
 
 
 class GroupMemberThread(models.Model):
-    thread = models.ForeignKey(Thread)
+    thread = models.ForeignKey(Thread, on_delete=models.CASCADE)
     # we could replace ``group`` and ``user`` below with
     # ``member=models.ForeignKey(geonode.groups.models.GroupMember)``
     # but that would mean importing from geonode core apps inside an external
     # app. This is an argument for moving this app into genode.contrib
-    group = models.ForeignKey(Group)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
     unread = models.BooleanField(
         default=True
     )
@@ -88,9 +89,8 @@ class GroupMemberThread(models.Model):
 
 
 class UserThread(models.Model):
-    
-    thread = models.ForeignKey(Thread)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    thread = models.ForeignKey(Thread, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     
     unread = models.BooleanField(
         default=True
@@ -101,10 +101,11 @@ class UserThread(models.Model):
 
 
 class Message(models.Model):
+    thread = models.ForeignKey(
+        Thread, related_name="messages", on_delete=models.CASCADE)
     
-    thread = models.ForeignKey(Thread, related_name="messages")
-    
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="sent_messages", verbose_name=_('Sender'))
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="sent_messages", verbose_name=_(
+        'Sender'), on_delete=models.CASCADE)
     sent_at = models.DateTimeField(_('Sent at'), default=timezone.now)
     
     content = models.TextField(_('Content'))
