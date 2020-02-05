@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "geonode-user-messages",
-    version = "2.0.0c",
+    version = "2.0.0",
     author = "Eldarion",
     author_email = "development@eldarion.com",
     description = "Fork of user-messages: a reusable private user messages application for Django",
