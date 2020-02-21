@@ -13,7 +13,7 @@ from user_messages.utils import cached_attribute
 
 
 class Thread(models.Model):
-    
+
     subject = models.CharField(
         _('Subject'), max_length=150
     )
@@ -33,7 +33,7 @@ class Thread(models.Model):
     )
 
     objects = ThreadManager()
-    
+
     def get_absolute_url(self):
         return reverse("messages_thread_detail", kwargs={"thread_id": self.pk})
 
@@ -41,7 +41,7 @@ class Thread(models.Model):
     @cached_attribute
     def first_message(self):
         return self.messages.all()[0]
-    
+
     @property
     @cached_attribute
     def latest_message(self):
@@ -91,7 +91,7 @@ class GroupMemberThread(models.Model):
 class UserThread(models.Model):
     thread = models.ForeignKey(Thread, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    
+
     unread = models.BooleanField(
         default=True
     )
@@ -103,17 +103,17 @@ class UserThread(models.Model):
 class Message(models.Model):
     thread = models.ForeignKey(
         Thread, related_name="messages", on_delete=models.CASCADE)
-    
+
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="sent_messages", verbose_name=_(
         'Sender'), on_delete=models.CASCADE)
     sent_at = models.DateTimeField(_('Sent at'), default=timezone.now)
-    
+
     content = models.TextField(_('Content'))
-    
+
     objects = MessageManager()
-    
+
     class Meta:
         ordering = ("sent_at",)
-    
+
     def get_absolute_url(self):
         return self.thread.get_absolute_url()

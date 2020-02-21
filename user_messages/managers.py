@@ -5,7 +5,7 @@ from user_messages.signals import message_sent
 
 
 class ThreadManager(Manager):
-    
+
     def active_threads(self, user):
         """Return all active threads where the user is involved.
 
@@ -46,7 +46,7 @@ class ThreadManager(Manager):
 
 
 class MessageManager(Manager):
-    
+
     def new_reply(self, thread, user, content):
         """Generate a new message for the input thread.
 
