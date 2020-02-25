@@ -125,10 +125,6 @@ class ViewsTestCase(Base):
             self.assertRedirects(response, reverse("messages_inbox"))
 
     def test_message_create_no_args_get_renders(self):
-        mock_initial = {
-            "to_users": [None],
-            "to_groups": [None],
-        }
         response = self.client.get(reverse("message_create_multiple"))
         self.assertEqual(response.status_code, 200)
 

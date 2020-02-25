@@ -19,7 +19,7 @@ def inbox(request, template_name="user_messages/inbox.html"):
         template_name,
         context={
             "threads_all": Thread.objects.sorted_active_threads(request.user),
-            "threads_unread" : Thread.objects.sorted_unread_threads(
+            "threads_unread": Thread.objects.sorted_unread_threads(
                 request.user),
         }
     )
@@ -33,7 +33,6 @@ def thread_detail(request, thread_id,
         pk=thread_id
     )
     if request.method == "POST":
-        #form = form_class(request.POST, user=request.user, thread=thread)
         form = MessageReplyForm(request.POST, user=request.user, thread=thread)
         if form.is_valid():
             form.save()

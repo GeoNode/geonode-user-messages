@@ -35,9 +35,10 @@ class NewMessageForm(forms.Form):
             group_list_all = []
             try:
                 group_list_all = self.sender.group_list_all().values('group')
-            except:
+            except Exception:
                 pass
-            public_groups = GroupProfile.objects.exclude(access="public-invite").exclude(access="private").values('group')
+            public_groups = GroupProfile.objects.exclude(
+                access="public-invite").exclude(access="private").values('group')
 
             self.fields["to_groups"].queryset = GroupProfile.objects.filter(
                 Q(group__isnull=True) | Q(group__in=groups) |
@@ -80,5 +81,5 @@ class MessageReplyForm(forms.Form):
         super(MessageReplyForm, self).__init__(*args, **kwargs)
 
     def save(self):
-        return Message.objects.new_reply(self.thread, self.user,
-            self.cleaned_data["content"])
+        return Message.objects.new_reply(
+            self.thread, self.user, self.cleaned_data["content"])

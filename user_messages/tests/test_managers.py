@@ -8,7 +8,6 @@ from geonode.groups.models import GroupProfile
 
 from user_messages import models
 from user_messages import managers
-#from user_messages.signals import message_sent
 
 
 class Base(TestCase):
@@ -123,7 +122,7 @@ class ThreadManagerGroupsTestCase(Base):
             from_user=self.first_user,
             subject="first message of the third thread",
             content="test",
-            to_groups=[self.first_group_profile,]
+            to_groups=[self.first_group_profile, ]
         )
         self.second_message = models.Message.objects.new_message(
             from_user=self.first_user,

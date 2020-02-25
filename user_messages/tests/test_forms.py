@@ -72,8 +72,8 @@ class NewMessageFormTestCase(TestCase):
             {
                 "subject": "",
                 "content": "dummy content",
-                "to_users": [2,],
-                "to_groups": [1,],
+                "to_users": [2, ],
+                "to_groups": [1, ],
             },
             current_user=self.first_user
         )
@@ -84,8 +84,8 @@ class NewMessageFormTestCase(TestCase):
             {
                 "subject": "dummy subject",
                 "content": "",
-                "to_users": [2,],
-                "to_groups": [1,],
+                "to_users": [2, ],
+                "to_groups": [1, ],
             },
             current_user=self.first_user
         )
@@ -108,7 +108,7 @@ class NewMessageFormTestCase(TestCase):
             {
                 "subject": "dummy subject",
                 "content": "dummy content",
-                "to_users": [self.second_user.id,],
+                "to_users": [self.second_user.id, ],
                 "to_groups": [],
             },
             current_user=self.first_user
@@ -132,7 +132,7 @@ class NewMessageFormTestCase(TestCase):
             {
                 "subject": "dummy subject",
                 "content": "dummy content",
-                "to_users": [self.first_user.id,],
+                "to_users": [self.first_user.id, ],
                 "to_groups": [],
             },
             current_user=self.first_user
@@ -145,7 +145,7 @@ class NewMessageFormTestCase(TestCase):
             {
                 "subject": "dummy subject",
                 "content": "dummy content",
-                "to_users": [10000,],
+                "to_users": [10000, ],
                 "to_groups": [],
             },
             current_user=self.first_user
