@@ -40,6 +40,7 @@ def thread_detail(request, thread_id,
     else:
         form = MessageReplyForm(user=request.user, thread=thread)
         thread.userthread_set.filter(user=request.user).update(unread=False)
+        thread.groupmemberthread_set.filter(user=request.user).update(unread=False)
     return render(request, template_name, context={
         "thread": thread,
         "form": form
