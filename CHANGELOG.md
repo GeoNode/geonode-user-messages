@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.0.1](https://github.com/GeoNode/geonode-user-messages/releases/tag/2.0.1)
+
+### [Resolved Issues](https://github.com/GeoNode/geonode-user-messages/issues?q=is%3Aissue+is%3Aclosed+milestone%3A2.0.1)
+
 ## [2.0.0](https://github.com/GeoNode/geonode-user-messages/releases/tag/2.0.0)
 
 **Featrues**
