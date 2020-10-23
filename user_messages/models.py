@@ -40,12 +40,12 @@ class Thread(models.Model):
     @property
     @cached_attribute
     def first_message(self):
-        return self.messages.all()[0]
+        return self.messages.first()
 
     @property
     @cached_attribute
     def latest_message(self):
-        return self.messages.order_by("-sent_at")[0]
+        return self.messages.order_by("-sent_at").first()
 
     @property
     def num_messages(self):

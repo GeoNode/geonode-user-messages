@@ -112,8 +112,11 @@ def _sort_distinct_thread_queryset(thread_qs, sort_descending=True):
     """
 
     materialized_qs = list(thread_qs)
-    materialized_qs.sort(
-        key=lambda thread: thread.latest_message.sent_at,
-        reverse=sort_descending
-    )
+    try:
+        materialized_qs.sort(
+            key=lambda thread: thread.latest_message.sent_at,
+            reverse=sort_descending
+        )
+    except Exception:
+        pass
     return materialized_qs
