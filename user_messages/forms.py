@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.core.exceptions import ValidationError
 
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from user_messages.models import Message
 
