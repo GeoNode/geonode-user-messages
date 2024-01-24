@@ -19,14 +19,14 @@ class Thread(models.Model):
     )
     single_users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        through="UserThread",
+        through="user_messages.UserThread",
         verbose_name=_('Users'),
         blank=True,
         related_name="single_threads"
     )
     group_users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        through="GroupMemberThread",
+        through="user_messages.GroupMemberThread",
         verbose_name=_('Group Members'),
         blank=True,
         related_name="group_threads"
